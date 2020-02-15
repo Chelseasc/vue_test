@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="app">
+    <p>你好，<span id='name'></span></p>
+</div>
+<script>
+  var obj = {};
+  Object.defineProperty(obj, "name", { // 定义一个叫name的属性，这个属性可以通过get() set()设置getter setter
+    // getter  setter相当于拦截器
+    get() { // step3 将来访问的时候会触发get()，比如最下面的console.log
+      debugger
+      console.log('获取name')
+      return document.querySelector('#name').innerHTML;
+    },
+    set(nick) { // step2
+      debugger
+      console.log('设置name')
+      document.querySelector('#name').innerHTML = nick; // .innerHTML = nick执行完 页面立刻显示nick的内容
+    }
+  });
+debugger
+  obj.name = "Jerry"; // step1 会先执行这句 然后调起set()
+  console.log(obj.name) // step4 要执行这句 会先执行get()
+</script>
+</body>
+</html>
