@@ -1,21 +1,37 @@
 <template>
   <div id="app">
-    <div class="sex content" v-if="page === 0">
+    <div class="sex content" v-show="page === 0">
       <p>1.请问您的性别是：</p>
       <Sex :sexList="sexList" @radio="checkSex"></Sex>
     </div>
-    <div class="hobby content" v-if="page === 1">
-      <p>2.请选择您的兴趣爱好：</p>
+    <div class="hobby content" v-show="page === 1">
+      <p>2.请选择您的兴趣爱好(至少2个)：</p>
       <Hobby :hobbyList="hobbyList" @checkbox="checkHobby"></Hobby>
     </div>
-    <div class="introduction content" v-if="page === 2">
+    <div class="introduction content" v-show="page === 2">
       <p>3. 请介绍一下你自己：</p>
-      <textarea rows="3" cols="50" placeholder="不能少于100字"></textarea>
+      <textarea rows="3" cols="30" placeholder="不能少于100字"
+        @input="introInput" v-model="introduction"></textarea>
     </div>
     <div class="footer">
-        <button @click="handleSubmit" v-if="page === 2">提交</button>
-        <button @click="handleNext" v-if="page !== 2">下一步</button>
-        <button @click="handleBack" v-if="page !== 0">上一步</button>
+        <button
+          @click="handleSubmit"
+          v-if="page === 2"
+          :class="{'ableClick': !isSubmit}"
+          :disabled="!isSubmit"
+        >提交</button>
+        <button 
+          @click="handleBack" 
+          v-if="page !== 0"
+          :class="{'ableClick': page === 1 && !isHobbyBack }"
+          :disabled="page === 1 && !isHobbyBack"
+        >上一步</button>
+        <button
+          @click="handleNext"
+          v-if="page !== 2"
+          :class="{'ableClick': (page === 0 && !isSexNext) || (page === 1 && !isHobbyNext)}"
+          :disabled="(page === 0 && !isSexNext) || (page === 1 && !isHobbyNext)"
+        >下一步</button>
         <button @click="handleReset">重置</button>
       </div>
   </div>
@@ -31,9 +47,14 @@ export default {
   },
   data() {
     return {
-      page: 0, // 填到第几页
+      page: 0, // 填到第几页了
       sexValue: '', // 性别选择value
       hobbyValue: '', // 爱好选择value
+      introduction: '', // 第三页介绍内容
+      isSexNext: false, // 性别页是否可以下一步
+      isHobbyNext: false, // 爱好页是否可以下一步
+      isHobbyBack: true, // 爱好页是否可以上一步
+      isSubmit: false, // 是否可以提交
       sexList: [
         {
           name: '男',
@@ -74,13 +95,26 @@ export default {
   },
   methods: {
     checkSex(data) {
+      if(data) {
+        this.isSexNext = true;
+      }
       this.sexValue = data;
     },
     checkHobby(arr) {
+      if(arr.length > 1) {
+        this.isHobbyNext = true;
+      }
       this.hobbyValue = arr;
     },
+    introInput() {
+      if(this.introduction.length > 100) {
+        this.isSubmit = true;
+      } else {
+        this.isSubmit = false;
+      }
+    },
     handleSubmit() {
-
+      // 调用后段接口
     },
     handleNext() {
       this.page++;
@@ -89,7 +123,10 @@ export default {
       this.page--;
     },
     handleReset() {
-
+      // todo 第一二页重置
+      switch(this.page) {
+        case 2: this.introduction = ''
+      }
     }
   }
 }
@@ -116,7 +153,8 @@ button {
   padding: 10px 14px;
   border: 1px solid #0066ff;
   border-radius: 6px;
-  background: #fff;
+  background: #0066ff;
+  color: #fff;
   margin-right: 10px;
   cursor: pointer;
   outline: none;
@@ -124,5 +162,9 @@ button {
 textarea {
   border: 1px solid #eee;
   outline: none;
+}
+.ableClick {
+  background: #eee;
+  color: grey;
 }
 </style>

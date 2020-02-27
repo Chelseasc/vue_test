@@ -27,10 +27,12 @@ export default {
   },
   methods: {
     handleCheck(e) {
-      console.log('选中：', e.target);
-      console.log('选中：', e.target.value);
-      console.log('选中：', e.target.checked);
-      
+      const val = e.target.value;
+      if(e.target.checked) {
+        this.checkValue.push(val);
+      } else {
+        this.checkValue.splice(this.checkValue.indexOf(val), 1)
+      }
       this.$emit('checkbox', this.checkValue);
     }
   }
